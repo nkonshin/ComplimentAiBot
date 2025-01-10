@@ -2,6 +2,6 @@
 __pycache__
 .env
 quiz.py
-photos
-photos_flirt
-photos_girl
+photos/
+photos_flirt/
+photos_girl/
