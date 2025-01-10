@@ -13,7 +13,7 @@ shown_photos = []
 
 
 def get_random_photo() -> str:
-    photo_dirs = os.getenv('PHOTOS_DIRECTORY')
+    photo_dirs = os.getenv('PHOTOS_COMPLIMENT_DIRECTORY')
     if not os.path.exists(photo_dirs):
         raise Exception('No photo directory')
 

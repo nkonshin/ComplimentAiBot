@@ -117,3 +117,10 @@ async def get_logs(message: types.Message):
         await message.reply(f'<pre>{log_text}</pre>', parse_mode='HTML')
     else:
         await message.reply('You are not authorized to view the logs.')
+
+
+async def log_user_id(message: types.Message):
+    user_id = message.from_user.id
+    username = message.from_user.username
+    await message.reply(f"Your user ID is {user_id}")
+    logging.info(f"User ID: {user_id}, Username: {username}")

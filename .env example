@@ -1,2 +1,7 @@
-API_TOKEN = your telegram token
-PHOTOS_DIRECTORY = photo directory, default=photos
+API_TOKEN = your api token
+ADMIN_ID= your id 
+YOUR_LOVE_ID= The id of the girl you want to send a compliment to every morning.
+PHOTOS_COMPLIMENT_DIRECTORY = folder path with photos for compliment
+PHOTOS_FLIRT_DIRECTORY = folder path with flirt
+PHOTOS_GIRL_DIRECTORY = folder path with photos
+DATABASE_URL=postgresql://user:password@localhost:5432/bot_logs

@@ -2,13 +2,14 @@ import logging
 import os
 from datetime import datetime, timedelta
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types  # Add types here
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 from aiogram.utils import executor
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
+import pytz
 
 from handlers import (
     cmd_start,
@@ -19,7 +20,7 @@ from handlers import (
     start_quiz,
     first_question,
     next_question,
-    losing_quiz, echo, get_logs,
+    losing_quiz, echo, get_logs, log_user_id,
 )
 from utils import QuizState
 
@@ -44,16 +45,18 @@ dp.register_callback_query_handler(first_question, Text('start_quiz'), state=Qui
 dp.register_callback_query_handler(next_question, Text('correct_answer'), state=QuizState.number_correct_answers)
 dp.register_callback_query_handler(losing_quiz, Text('wrong_answer'), state=QuizState.number_correct_answers)
 dp.register_message_handler(get_logs, commands=['get_logs'])
+dp.register_message_handler(log_user_id, commands=['get_user_id'])
 
 # Function to send daily message
 async def send_daily_message():
-    user_id = '@alsudautova17'
-    message_text = 'Получить комплимент 😍'
-    await bot.send_message(chat_id=user_id, text=message_text)
+    user_id = os.getenv('YOUR_LOVE_ID')  # Replace with the actual numeric user ID
+    Bot.set_current(bot)  # Set the current bot instance
+    message = types.Message(chat=types.Chat(id=user_id, type='private'), from_user=types.User(id=user_id, is_bot=False, first_name='User'))
+    await send_compliment(message)
 
 # Set up the scheduler
 scheduler = AsyncIOScheduler()
-scheduler.add_job(send_daily_message, CronTrigger(hour=9, minute=0, timezone='Europe/Moscow'))
+scheduler.add_job(send_daily_message, CronTrigger(hour=9, minute=0, timezone=pytz.timezone('Europe/Moscow')))
 scheduler.start()
 
 if __name__ == '__main__':
