@@ -1,10 +1,13 @@
 import logging
 import os
+from datetime import datetime, timedelta
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 from aiogram.utils import executor
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
 from handlers import (
@@ -24,6 +27,7 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 API_TOKEN = os.getenv('API_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')
 
 bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
@@ -40,6 +44,17 @@ dp.register_callback_query_handler(first_question, Text('start_quiz'), state=Qui
 dp.register_callback_query_handler(next_question, Text('correct_answer'), state=QuizState.number_correct_answers)
 dp.register_callback_query_handler(losing_quiz, Text('wrong_answer'), state=QuizState.number_correct_answers)
 dp.register_message_handler(get_logs, commands=['get_logs'])
+
+# Function to send daily message
+async def send_daily_message():
+    user_id = '@alsudautova17'
+    message_text = 'Получить комплимент 😍'
+    await bot.send_message(chat_id=user_id, text=message_text)
+
+# Set up the scheduler
+scheduler = AsyncIOScheduler()
+scheduler.add_job(send_daily_message, CronTrigger(hour=9, minute=0, timezone='Europe/Moscow'))
+scheduler.start()
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
