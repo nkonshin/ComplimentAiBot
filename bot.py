@@ -16,7 +16,7 @@ from handlers import (
     start_quiz,
     first_question,
     next_question,
-    losing_quiz, echo,
+    losing_quiz, echo, get_logs,
 )
 from utils import QuizState
 
@@ -39,6 +39,7 @@ dp.register_message_handler(start_quiz, Text('Викторина 🎯'))
 dp.register_callback_query_handler(first_question, Text('start_quiz'), state=QuizState.start_quiz)
 dp.register_callback_query_handler(next_question, Text('correct_answer'), state=QuizState.number_correct_answers)
 dp.register_callback_query_handler(losing_quiz, Text('wrong_answer'), state=QuizState.number_correct_answers)
+dp.register_message_handler(get_logs, commands=['get_logs'])
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
