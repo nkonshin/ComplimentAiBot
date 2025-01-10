@@ -46,7 +46,7 @@ async def send_compliment(message: types.Message):
                                caption=random_compliment)
 
 
-async def start_quiz(message: types.Message):
+async def start_quiz(message: types.Message, state: FSMContext):
     await QuizState.start_quiz.set()
     await message.answer(f'Количество вопросов: {len(quiz.IT)}',
                          reply_markup=END_QUIZ_KB)
@@ -58,7 +58,8 @@ async def first_question(callback_query: types.CallbackQuery,
                          state: FSMContext):
     user_id = callback_query.from_user.id
     async with state.proxy() as data:
-        data[user_id] = 0
+        data['user_id'] = user_id
+        data['question_index'] = 0
 
     await QuizState.next()
     question_text, list_answers, correct_answer = current_question(0)
@@ -71,29 +72,18 @@ async def next_question(callback_query: types.CallbackQuery,
                         state: FSMContext):
     user_id = callback_query.from_user.id
     async with state.proxy() as data:
-        data[user_id] += 1
+        data['question_index'] += 1
 
-    number_correct_answers = data.get(user_id)
-    nnq = number_correct_answers  # next number question
+    question_index = data['question_index']
 
-    if number_correct_answers < QUIZ_LENGTH:
-        await callback_query.answer(text='Правильный ответ')
-
-        question_text, list_answers, correct_answer = current_question(nnq)
+    if question_index < QUIZ_LENGTH:
+        question_text, list_answers, correct_answer = current_question(question_index)
         keyboard = answer_kb(list_answers, correct_answer)
         await callback_query.message.edit_text(text=question_text,
                                                reply_markup=keyboard)
     else:
-        await callback_query.message.delete()
-        await callback_query.message.answer(text=ba.WIN_QUIZ,
-                                            reply_markup=MAIN_KB)
         await state.finish()
-        await callback_query.message.answer_video(
-            video=types.InputFile('videos/win_quiz.mp4')
-            )
-        await callback_query.message.answer_photo(
-            photo=types.InputFile('videos/bun.png')
-            )
+        await callback_query.message.edit_text(text='Викторина окончена.', reply_markup=MAIN_KB)
 
 
 async def losing_quiz(callback_query: types.CallbackQuery, state: FSMContext):

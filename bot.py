@@ -17,9 +17,8 @@ from handlers import (
     first_question,
     next_question,
     losing_quiz, echo,
-    )
+)
 from utils import QuizState
-
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -30,31 +29,16 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-
 dp.register_message_handler(cmd_start, commands=['start'])
-
 dp.register_message_handler(end_quiz, commands=['cancel'], state='*')
 dp.register_message_handler(end_quiz, Text('Закончить викторину'), state='*')
-
 dp.register_message_handler(send_photo, Text('Покажи пупсика 📸'))
-
 dp.register_message_handler(send_flirt, Text('Лучший подкат в твоей жизни 🤭'))
-
 dp.register_message_handler(send_compliment, Text('Получить комплимент 😍'))
-
 dp.register_message_handler(start_quiz, Text('Викторина 🎯'))
-dp.register_callback_query_handler(first_question,
-                                   Text('start_quiz'),
-                                   state=QuizState.start_quiz)
-dp.register_callback_query_handler(next_question,
-                                   Text('correct_answer'),
-                                   state=QuizState.number_correct_answers)
-dp.register_callback_query_handler(losing_quiz,
-                                   Text('wrong_answer'),
-                                   state=QuizState.number_correct_answers)
-
-dp.register_message_handler(echo, state='*')
-
+dp.register_callback_query_handler(first_question, Text('start_quiz'), state=QuizState.start_quiz)
+dp.register_callback_query_handler(next_question, Text('correct_answer'), state=QuizState.number_correct_answers)
+dp.register_callback_query_handler(losing_quiz, Text('wrong_answer'), state=QuizState.number_correct_answers)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
